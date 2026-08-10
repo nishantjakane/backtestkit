@@ -1,5 +1,15 @@
 import pandas as pd
 
+class Candle():
+    def __init__(self,datetime,open,high,low,close):
+        self.datetime = datetime
+        self.open = open
+        self.high = high
+        self.low = low
+        self.close = close
+
+
+
 # The csv should be in format datetime ,open,high,low,close. volume is optional 
 
 def load_data(filepath):
@@ -37,3 +47,6 @@ def load_data(filepath):
 
 
     return data
+
+def row_to_candle(row):
+    return Candle(row.datetime,row.open,row.high,row.low,row.close)
