@@ -6,6 +6,9 @@ class Strategy():
         self.history = []
         self.current_candle = None
 
+    def init(self):
+        pass
+
     def on_bar(self,candle):
         return None
 
