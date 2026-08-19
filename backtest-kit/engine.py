@@ -16,6 +16,7 @@ class Engine:
         self.orders = [] # current active orders
         self.positions = [] # current open positions
         self.trades = [] # completed trades
+        self.market_orders=[] # current market orders
 
 
     def run(self):
@@ -24,6 +25,7 @@ class Engine:
         for index,row in self.data.iterrows():
             candle = row_to_candle(row)
             
+            self.process_market_orders(candle)
             self.process_positions(candle)
             self.process_orders(candle)
 
@@ -33,7 +35,10 @@ class Engine:
             self.strategy.history.append(candle)
     
     def submit_order(self,order):
-        self.orders.append(order)
+        if order.order_type == OrderType.LIMIT:
+            self.orders.append(order)
+        elif order.order_type == OrderType.MARKET:
+            self.market_orders.append(market_orders)
 
     def process_orders(self,candle):
         open = candle.open
@@ -56,9 +61,20 @@ class Engine:
                         order.execute(candle)
                         self.submit_position(order,order.price,datetime)
                         orders_to_remove.append(order)
-        
+
         for order in orders_to_remove:
             self.orders.remove(order)
+
+
+    def process_market_orders(self,candle):
+        market_order_to_remove =[]
+        for order in self.market_orders:
+            order.execute(candle)
+            self.submit_position(order,candle.open,candle.datetime)
+            self.market_orders.append(order)
+
+        for order in market_order_to_remove:
+            self.market_orders.remove(order)
 
     def process_positions(self,candle):
         open = candle.open
