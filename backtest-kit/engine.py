@@ -38,7 +38,8 @@ class Engine:
         if order.order_type == OrderType.LIMIT:
             self.orders.append(order)
         elif order.order_type == OrderType.MARKET:
-            self.market_orders.append(market_orders)
+            order.price = None
+            self.market_orders.append(order)
 
     def process_orders(self,candle):
         open = candle.open
@@ -71,7 +72,7 @@ class Engine:
         for order in self.market_orders:
             order.execute(candle)
             self.submit_position(order,candle.open,candle.datetime)
-            self.market_orders.append(order)
+            market_order_to_remove.append(order)
 
         for order in market_order_to_remove:
             self.market_orders.remove(order)
@@ -88,8 +89,18 @@ class Engine:
         for position in self.positions:
             tp = position.take_profit
             sl = position.stop_loss
-            tp_triggered = tp <= high and tp >=low # this triggers only when the price in range of candle
-            sl_triggered = sl <= high and sl >=low
+            if tp is None:
+                tp_triggered = None
+            else:
+                tp_triggered = tp <= high and tp >=low # this triggers only when the price in range of candle
+            if sl is None:
+                sl_triggered = None
+            else:
+                sl_triggered = sl <= high and sl >=low
+
+            if tp is None and sl is None:
+                continue
+                 
             if(not tp_triggered and not sl_triggered):
                 continue
                 
@@ -112,6 +123,18 @@ class Engine:
         for position in positions_to_remove:
             self.positions.remove(position)
 
+    def close_position(self,candle,position,exit_type):
+        trade = Trade(
+            self.strategy.generate_trade_id(),
+            position,
+            candle.close,
+            candle.datetime,
+            exit_type
+        )
+
+        self.positions.remove(position)
+
+        self.trades.append(trade)
 
     def submit_position(self,order,entry_price,entry_time):
         position = Position(
