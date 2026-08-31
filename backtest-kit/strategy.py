@@ -27,16 +27,22 @@ class Strategy():
         self.trade_count+=1
         return self.trade_count
 
-    def createOrder(self,side,order_type,price,qty) -> Order:
+    def create_order(self,side,order_type,price,qty,take_profit=None,stop_loss=None) -> Order:
         order = Order(
             self.generate_order_id(),
             side,
             order_type,
             price,
             qty,
+            take_profit,
+            stop_loss,
             self.current_candle.datetime
         )
 
         self.engine.submit_order(order)
         
         return order
+
+    def close_position(self,position,exit_type):
+
+        self.engine.close_position(self.current_candle,position,exit_type)
