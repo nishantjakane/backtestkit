@@ -87,6 +87,9 @@ class Engine:
         positions_to_remove =[]
 
         for position in self.positions:
+
+            position.update_price(candle)
+
             tp = position.take_profit
             sl = position.stop_loss
             if tp is None:
