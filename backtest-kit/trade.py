@@ -1,5 +1,6 @@
 from enum import Enum
 import datetime as dt
+from order import Side
 
 class ExitType(Enum):
     TP="TP"
@@ -13,10 +14,20 @@ class Position:
     self.side=order.side
     self.qty=order.qty
     self.entry_price=entry_price
+    self.current_price = entry_price
     self.entry_time =entry_time
     self.take_profit=order.take_profit
     self.stop_loss=order.stop_loss
     self.current_pnl = 0
+
+
+    def update_price(self,candle):
+        self.current_price = candle.close
+        if self.side == Side.BUY:
+            self.current_pnl = (self.current_price-self.entry_price)*self.qty
+        elif self.side == Side.SELL:
+            self.current_pnl = (self.entry_price-self.current_price)*self.qty
+            
 
 
 
@@ -30,7 +41,11 @@ class Trade:
         self.exit_price=exit_price
         self.exit_time=exit_time
         self.exit_type=exit_type
-        self.pct_return=(self.entry_price-self.exit_price)/self.entry_price
-        self.pnl=(self.entry_price-self.exit_price)*qty
-        self.duration=(exit_time-entry_time).dt.minutes # duration saved in minutes
+        if self.side == Side.SELL:
+            self.pct_return=(self.entry_price-self.exit_price)/self.entry_price
+            self.pnl=(self.entry_price-self.exit_price)*self.qty
+        elif self.side == Side.BUY:
+            self.pct_return=(self.exit_price-self.entry_price)/self.entry_price
+            self.pnl=(self.exit_price-self.entry_price)*self.qty
+        self.duration=(self.exit_time-self.entry_time).total_seconds() / 60 # duration saved in minutes
 
