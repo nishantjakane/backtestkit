@@ -1,6 +1,6 @@
-from data import load_data,Candle,row_to_candle
-from order import Side , OrderStatus, OrderType
-from trade import Trade,Position,ExitType
+from backtest_kit.data import load_data,Candle,row_to_candle
+from backtest_kit.order import Side , OrderStatus, OrderType
+from backtest_kit.trade import Trade,Position,ExitType
 from enum import Enum
 
 class IntrabarPriority(Enum):
@@ -33,6 +33,8 @@ class Engine:
             self.strategy.current_candle = candle
             self.strategy.on_bar(candle)
             self.strategy.history.append(candle)
+
+        return self.trades
     
     def submit_order(self,order):
         if order.order_type == OrderType.LIMIT:
