@@ -1,6 +1,6 @@
 from enum import Enum
 import datetime as dt
-from order import Side
+from backtest_kit.order import Side
 
 class ExitType(Enum):
     TP="TP"
@@ -9,16 +9,16 @@ class ExitType(Enum):
     MANUAL="MANUAL"
 
 class Position:
-   def __init__(self,position_id,order,entry_price,entry_time):
-    self.position_id = position_id
-    self.side=order.side
-    self.qty=order.qty
-    self.entry_price=entry_price
-    self.current_price = entry_price
-    self.entry_time =entry_time
-    self.take_profit=order.take_profit
-    self.stop_loss=order.stop_loss
-    self.current_pnl = 0
+    def __init__(self,position_id,order,entry_price,entry_time):
+        self.position_id = position_id
+        self.side=order.side
+        self.qty=order.qty
+        self.entry_price=entry_price
+        self.current_price = entry_price
+        self.entry_time =entry_time
+        self.take_profit=order.take_profit
+        self.stop_loss=order.stop_loss
+        self.current_pnl = 0
 
 
     def update_price(self,candle):
