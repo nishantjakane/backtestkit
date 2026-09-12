@@ -1,4 +1,4 @@
-from order import Order,OrderStatus,OrderType,Side
+from backtest_kit.order import Order,OrderStatus,OrderType,Side
 
 class Strategy():
     def __init__(self,engine):
