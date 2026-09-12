@@ -2,6 +2,7 @@ from backtest_kit.data import load_data,Candle,row_to_candle
 from backtest_kit.order import Side , OrderStatus, OrderType
 from backtest_kit.trade import Trade,Position,ExitType
 from enum import Enum
+import pandas as pd
 
 class IntrabarPriority(Enum):
     TP_FIRST="TP_FIRST"
@@ -161,3 +162,24 @@ class Engine:
         )
 
         self.trades.append(trade)
+
+    def save_trades(self,file_path):
+        data = []
+
+        for trade in self.trades:
+            data.append({
+                "trade_id":trade.trade_id,
+                "side":trade.side,
+                "qty":trade.qty,
+                "entry_price":trade.entry_price,
+                "entry_time":trade.entry_time,
+                "exit_price":trade.exit_price,
+                "exit_time":trade.exit_time,
+                "exit_type":trade.exit_type,
+                "pct_return":trade.pct_return,
+                "pnl":trade.pnl,
+                "duration":trade.duration
+            })
+
+        df = pd.DataFrame(data)
+        df.to_csv(file_path,index=False)
