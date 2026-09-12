@@ -16,8 +16,14 @@ class Position:
         self.entry_price=entry_price
         self.current_price = entry_price
         self.entry_time =entry_time
-        self.take_profit=order.take_profit
-        self.stop_loss=order.stop_loss
+
+        if self.side == Side.BUY:
+            self.take_profit= entry_price * (1+ order.take_profit/100)
+            self.stop_loss = entry_price * (1 - order.stop_loss/100)
+        elif self.side == Side.SELL:
+            self.take_profit=entry_price*(1-order.take_profit/100)
+            self.stop_loss=entry_price*(1+order.stop_loss/100)
+        
         self.current_pnl = 0
 
 
