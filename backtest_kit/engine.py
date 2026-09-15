@@ -183,3 +183,43 @@ class Engine:
 
         df = pd.DataFrame(data)
         df.to_csv(file_path,index=False)
+
+    
+    def save_positions(self,file_path):
+        data = []
+
+        for position in self.positions:
+            data.append({
+                "position_id":position.position_id,
+                "side":position.side,
+                "qty":position.qty,
+                "entry_price":position.entry_price,
+                "current_price":position.current_price,
+                "entry_time":position.entry_time,
+                "take_profit":position.take_profit,
+                "stop_loss":position.stop_loss,
+                "current_pnl":position.current_pnl
+            })
+
+        df = pd.DataFrame(data)
+        df.to_csv(file_path,index=False)
+
+    def save_orders(self,file_path):
+        data = []
+
+        for order in self.orders:
+            data.append({
+               "order_id":order.order_id,
+               "side":order.side,
+               "order_type":order.order_type,
+               "price":order.price,
+               "qty":order.qty,
+               "take_profit":order.take_profit,
+               "stop_loss":order.stop_loss,
+               "status":order.status,
+               "timestamp":order.timestamp,
+               "executed_timestamp":order.executed_timestamp 
+            })
+
+        df = pd.DataFrame(data)
+        df.to_csv(file_path,index=False)
