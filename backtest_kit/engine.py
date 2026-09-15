@@ -91,10 +91,14 @@ class Engine:
 
         for position in self.positions:
 
+            side = position.side
+
             position.update_price(candle)
 
             tp = position.take_profit
             sl = position.stop_loss
+
+
             if tp is None:
                 tp_triggered = None
             else:
@@ -107,9 +111,6 @@ class Engine:
             if tp is None and sl is None:
                 continue
                  
-            if(not tp_triggered and not sl_triggered):
-                continue
-                
             if(tp_triggered and sl_triggered):
                 if self.intrabarpriority==IntrabarPriority.TP_FIRST:
                     self.submit_trade(position,tp,datetime,ExitType.TP)
@@ -122,9 +123,27 @@ class Engine:
             if(tp_triggered):
                 self.submit_trade(position,tp,datetime,ExitType.TP)
                 positions_to_remove.append(position)
+                continue
             elif(sl_triggered):
                 self.submit_trade(position,sl,datetime,ExitType.SL)
                 positions_to_remove.append(position)
+                continue
+            
+            # Gap up TP SL handling
+            if side == Side.BUY:
+                tp_gap_up_condition = open > tp
+                sl_gap_down_condition = open < sl 
+            elif side == Side.SELL:
+                tp_gap_up_condition = open < tp
+                sl_gap_down_condition = open > sl
+            
+            if(tp_gap_up_condition):
+                self.submit_trade(position,open,datetime,ExitType.TP)
+                positions_to_remove.append(position)
+            elif(sl_gap_down_condition):
+                self.submit_trade(position,open,datetime,ExitType.SL)
+                positions_to_remove.append(position)
+
 
         for position in positions_to_remove:
             self.positions.remove(position)
